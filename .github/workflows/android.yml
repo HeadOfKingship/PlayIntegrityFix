@@ -17,7 +17,7 @@ jobs:
         submodules: 'recursive'
         fetch-depth: 1
         # ✅ 如果你确定存在这个分支就保留，否则删掉这行
-        ref: inject_manual
+        #ref: inject_manual
 
     - name: Set up JDK
       uses: actions/setup-java@v4
