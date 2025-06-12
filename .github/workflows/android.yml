@@ -2,41 +2,11 @@ name: Android CI
 
 on:
   push:
-    branches: inject_manual
+    branches: [ inject_manual ]
     paths-ignore: '**.md'
   workflow_dispatch:
 
 jobs:
-  build_vending:
-    runs-on: macos-15
-
-    steps:
-    - name: Check out
-      uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-        fetch-depth: 1
-        ref: inject_vending
-
-    - name: Set up JDK
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: 21
-
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-
-    - name: Build with Gradle
-      run: ./gradlew assembleRelease
-
-    - name: Upload CI module zip as artifact zip
-      uses: actions/upload-artifact@v4
-      with:
-        name: PlayIntegrityFix_${{ github.run_number }}-inject-vending
-        path: 'module/*'
-        compression-level: 9
-
   build_manual:
     runs-on: macos-15
 
@@ -46,6 +16,7 @@ jobs:
       with:
         submodules: 'recursive'
         fetch-depth: 1
+        # ✅ 如果你确定存在这个分支就保留，否则删掉这行
         ref: inject_manual
 
     - name: Set up JDK
@@ -54,13 +25,14 @@ jobs:
         distribution: 'temurin'
         java-version: 21
 
-    - name: Clean and regenerate gradle-wrapper.jar
-      run: |
-        gradle wrapper --gradle-version 8.6
+    - name: Install Gradle CLI
+      uses: gradle/gradle-build-action@v3
+
+    - name: Regenerate gradle-wrapper.jar
+      run: gradle wrapper --gradle-version 8.6
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-
 
     - name: Build with Gradle
       run: ./gradlew assembleRelease
